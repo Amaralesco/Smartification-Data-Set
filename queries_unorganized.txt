@@ -1,0 +1,101 @@
+INSERT INTO project
+VALUES (1, 'automatic cabinet', 3, 'description', 5, 'tags', 'spec_tags', 'sol_tags', 5, 'validation_fb_problem', 'file',1);
+
+select * from project
+
+
+
+
+--ALTER TABLE detailed_solution_hardware_component_list 
+--ADD component_update_running_version FLOAT;
+
+INSERT INTO detailed_solution VALUES (1232,1,'file',TRUE,1,'val_fb')
+
+
+INSERT INTO detailed_solution_hardware_component_list VALUES( 5 , 1232 , 7 , 10 , 3.01)
+
+INSERT INTO detailed_solution_hardware_component_list VALUES( 7 , 1232 , 3 , 1 , 2.01)
+
+SELECT * from detailed_solution_hardware_component_list 
+
+
+
+
+
+
+
+INSERT INTO update_component VALUES ( 12345 , 3.02 , 5, 0506 , 'file' , 'description')
+
+
+INSERT INTO update_component VALUES ( 54321 , 3.01 , 5, '1990-01-08 04:05:06' , 'description')
+
+
+INSERT INTO update_component VALUES ( 54322 , 3.01 , 4, '1990-01-08 04:05:06' , 'description') -- por exemplo esta nao vai dar porque nao temos o component 5
+
+select * from update_component
+
+INSERT INTO user_feedback VALUES (2,1,'6mon', 'adress@gmail.com')
+
+
+
+
+Insert into Profiling VALUES ('Clara', 1 , 'description')
+
+insert into behaviors VALUES (1, 'Blue' , 0, 'description')
+
+type_of_user, behaviours.name
+
+select * FROM behaviours_map inner join behaviours ON behaviours_map.behaviours.id = behaviours.behaviours_id
+
+SELECT *
+FROM behaviours
+INNER JOIN behaviours_map
+ON behaviours.behaviours_id= behaviours_map.behaviours_id
+WHERE behaviours_map.type_of_user = 'Antonio'
+
+--- ACTIVITIES 
+INSERT INTO activities VALUES ('Opening', 'The door is open')
+INSERT INTO activities VALUES ('Closing', 'The door is closing')
+
+INSERT INTO activities VALUES ('Open', 'The cabinet is open')
+INSERT INTO activities VALUES ('Close', 'The cabinet is Close')
+
+INSERT INTO activities VALUES ('Off', 'The equipment is offline, or not working')
+select * from activities
+
+
+
+INSERT INTO sensors VALUES ('Hinge Value Y', 'Measure the Hinge angle aka tightness, if hinge angle between Z and Y axis is not 90º, the door is slightly loose, not tightly close')
+INSERT INTO sensors VALUES ('Force Applied', 'Measure the force applied in the close activity')
+INSERT INTO sensors VALUES ('Weight', 'Measure the force applied to the bottom of the cabinet')
+INSERT INTO sensors VALUES ('Time of Execution', 'Measures the exection time of a chosen activity ')
+INSERT INTO sensors VALUES ('Battery', 'Measures the amount of battery remaining in the equipment in % ')
+also could be inserted Delay and lux sensivity 
+
+
+INSERT INTO measurements values (4, 1,'Open', 1, 'Hinge Value X', 70,'1999-01-15 04:05:20 +0000') --Nao deu
+INSERT INTO measurements values (5, 1,'Open', 1, 'Hinge Value X', 90,'1999-01-14 04:05:20 +0000')
+INSERT INTO measurements values (6, 1,'Open', 1, 'Hinge Value X', 90,'1999-01-16 04:05:20 +0000')
+INSERT INTO measurements values (7, 1,'opening', 1, 'Weight', 15,'1999-01-17 04:05:20 +0000')
+INSERT INTO measurements values (8, 1,'Off', 1, 'Battery', 50,'1999-01-20 20:20:20 +0000')
+INSERT INTO measurements values (9, 1,'Close', 1, 'Battery', 25,'1999-01-20 21:21:21 +0000')
+
+
+
+
+INSERT INTO automatic_monitoring VALUES (3,4,false,'Hinge value is too low', '1999-01-15 04:05:20 +0000',2)
+INSERT INTO automatic_monitoring VALUES (4,5,false,'Hinge value is too low', '1999-01-16 04:05:20 +0000',2)
+INSERT INTO automatic_monitoring VALUES (5,6,false,'Hinge value is too low', CURRENT_TIMESTAMP,2)
+--measurements_id (2) aqui tem que ser unico, nao sei se deviase
+
+INSERT INTO automatic_monitoring VALUES (5,6,false,'Hinge value is too low', CURRENT_TIMESTAMP,2)
+
+---CUIDADO ESTE AQUI NAO INCLUIR -> Usam o Serial
+
+INSERT INTO measurements ( project_id ,activity ,running_version ,sensor ,value, time_stamp)
+values ( 1,'Open', 1, 'Distance',44,'1999-01-20 21:24:44 +0000')
+
+INSERT INTO measurements ( project_id ,activity ,running_version ,sensor ,value, time_stamp)
+values ( 1,'Open', 1, 'Battery',50,CURRENT_TIMESTAMP)
+
+INSERT INTO automatic_monitoring(measurements_log_id,solved,description,time_stamp,risk) VALUES (7,false,'Hinge value is too low', CURRENT_TIMESTAMP,2)

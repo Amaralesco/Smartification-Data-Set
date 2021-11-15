@@ -1,0 +1,219 @@
+CREATE TABLE project (
+	project_id SERIAL PRIMARY KEY,
+	name VARCHAR(50),
+	project_state INT,
+	problem_description VARCHAR(600),
+	furniture_specifications_id INT,
+	problem_tags VARCHAR(150),
+	furniture_specification_tags VARCHAR(150),
+	solutions_tags VARCHAR(150),
+	validation_state_problem INT,
+	validation_feedback_problem VARCHAR(600),
+	eletronic_integration_file VARCHAR(300) --aceitar links grandes
+);
+
+ALTER TABLE project
+ADD running_version FLOAT;
+
+CREATE TABLE detailed_solution_hardware_component_list (
+	detailed_solution_hardware_component_list_id SERIAL PRIMARY KEY,
+	detailed_solution_id INT NOT NULL,
+  hardware_component_id INT NOT NULL,
+  quantity INT,
+component_update_running_version FLOAT,
+
+  FOREIGN KEY (detailed_solution_id) REFERENCES detailed_solution(detailed_solution_id) ON DELETE CASCADE
+);
+
+CREATE TABLE update_component(
+  update_component_version_id SERIAL PRIMARY KEY,
+  update_component_version FLOAT NOT NULL,
+  detailed_solution_hardware_component_list_id SERIAL,
+  time_stamp timestamp,
+  Description VARCHAR(512),
+  FOREIGN KEY (detailed_solution_hardware_component_list_id) REFERENCES detailed_solution_hardware_component_list (detailed_solution_hardware_component_list_id) ON DELETE CASCADE
+);
+
+--Profiling TODO
+
+CREATE TABLE runtime_user(
+  runtime_user_id SERIAL PRIMARY KEY,
+  class integer,
+  username VARCHAR(20),
+  email VARCHAR (50)
+); 
+
+
+CREATE TABLE profiling(
+  profile_name VARCHAR(50) PRIMARY KEY,
+  project_id SERIAL,
+  runtime_user_id SERIAL, --Devia ser UNIQUE
+  description VARCHAR(512),
+  FOREIGN KEY(project_id) REFERENCES project(project_id) ON DELETE CASCADE ,
+  FOREIGN KEY(runtime_user_id) REFERENCES runtime_user(runtime_user_id) ON DELETE CASCADE
+
+);
+
+CREATE TABLE behaviors_map (
+    type_of_user   VARCHAR(30) NOT NULL,
+    behaviours_id SERIAL NOT NULL
+);
+
+CREATE TABLE behaviors(
+  behaviors_id SERIAL PRIMARY KEY,
+  name VARCHAR(30) NOT NULL, 
+  value FLOAT NOT NULL,
+  description VARCHAR(256)
+);
+
+ALTER TABLE behaviors_map
+    ADD CONSTRAINT behaviors_map_type_of_user_FK FOREIGN KEY (type_of_user )
+        REFERENCES profiling ( type_of_user );
+
+ALTER TABLE behaviours_map
+    ADD CONSTRAINT behaviours_map_behaviours_id_FK FOREIGN KEY ( behaviours_id )
+        REFERENCES behaviours  ( behaviours_id );
+
+--Falta CHARACTERISTICS
+
+
+-- USER FEEDBACK
+
+
+
+CREATE TABLE user_feedback(
+  user_feedback_id SERIAL PRIMARY KEY,
+  project_id SERIAL,
+  time_of_use VARCHAR (20),
+  email VARCHAR (50),
+  FOREIGN KEY(project_id) REFERENCES project(project_id) ON DELETE CASCADE  
+);
+
+CREATE TABLE user_feedback_rating(
+  user_feedback_id SERIAL PRIMARY KEY,
+  rating INTEGER, --TODO can only go from 1-5
+  FOREIGN KEY(user_feedback_id) REFERENCES user_feedback(user_feedback_id) ON DELETE CASCADE
+);
+
+CREATE TABLE user_feedback_malfunction(
+  user_feedback_id SERIAL PRIMARY KEY,
+  description VARCHAR(512),
+  FOREIGN KEY(user_feedback_id) REFERENCES user_feedback(user_feedback_id) ON DELETE CASCADE
+);
+
+CREATE TABLE user_feedback_bugs(
+  user_feedback_id SERIAL PRIMARY KEY,
+  description VARCHAR(512),
+  FOREIGN KEY(user_feedback_id) REFERENCES user_feedback(user_feedback_id) ON DELETE CASCADE
+);
+
+CREATE TABLE user_feedback_features(
+  user_feedback_id SERIAL PRIMARY KEY,
+  description VARCHAR(512),
+  FOREIGN KEY(user_feedback_id) REFERENCES user_feedback(user_feedback_id) ON DELETE CASCADE
+);
+
+
+
+
+
+
+-- MEASUREMENTS
+
+CREATE TABLE activities(
+  activity VARCHAR(50) PRIMARY KEY,
+  description VARCHAR(256)
+);
+
+CREATE TABLE sensors(
+  sensor VARCHAR(50) PRIMARY KEY,
+  description VARCHAR(256)
+);
+
+--adicionar running version
+CREATE TABLE measurements(
+  measurements_log_id SERIAL PRIMARY KEY,
+  project_id SERIAL NOT NULL,
+  activity VARCHAR(50) NOT NULL,
+  running_version INTEGER NOT NULL,
+  sensor VARCHAR(50) NOT NULL,
+  value FLOAT,
+  time_stamp TIMESTAMP NOT NULL,
+  FOREIGN KEY (activity) REFERENCES activities(activity),
+  FOREIGN KEY (sensor) REFERENCES sensors(sensor)
+);
+
+CREATE TABLE measurements_map(
+ measurements_log_id SERIAL,
+ project_id SERIAL,
+ FOREIGN KEY (measurements_log_id) REFERENCES measurements(measurements_log_id),
+ FOREIGN KEY (project_id) REFERENCES project(project_id)
+);
+
+--AUTOMATIC MONITORING
+
+CREATE TABLE automatic_monitoring(
+ automatic_monitoring_id SERIAL PRIMARY KEY,
+ measurements_log_id SERIAL UNIQUE,
+ solved BOOLEAN,
+ description VARCHAR(512),
+ risk INTEGER ,
+ time_stamp timestamp, 
+ FOREIGN KEY (measurements_log_id) REFERENCES measurements(measurements_log_id)
+)
+
+
+CREATE TABLE automatic_maintenance(
+ automatic_maintenance_log_id SERIAL PRIMARY KEY,
+ problem VARCHAR(512),
+ cost int NOT NULL,
+ time_stamp timestamp,
+ mender VARCHAR(50),
+ description VARCHAR(512),
+ automatic_monitoring_id SERIAL NOT NULL,
+ FOREIGN KEY (automatic_monitoring_id) REFERENCES automatic_monitoring(automatic_monitoring_id)
+)
+
+
+--ESTÁ MAL; Refazer
+CREATE TABLE manual_monitoring(
+ manual_monitoring_id SERIAL PRIMARY KEY,
+ user_feedback_id SERIAL UNIQUE,
+ solved BOOLEAN,
+ description VARCHAR(512),
+ risk int,
+ time_stamp timestamp, 
+ FOREIGN KEY (user_feedback_id) REFERENCES user_feedback(user_feedback_id)
+)
+
+CREATE TABLE manual_maintenance(
+ manual_maintenance_log_id SERIAL PRIMARY KEY,
+ problem VARCHAR(512),
+ cost int NOT NULL,
+ time_stamp timestamp,
+ mender VARCHAR(50),
+ description VARCHAR(512),
+ manual_monitoring_id SERIAL NOT NULL,
+ FOREIGN KEY (manual_monitoring_id) REFERENCES manual_monitoring(manual_monitoring_id)
+)
+
+
+insert into manual_monitoring VALUES (1,1,TRUE,'The cabinet is non-responsive','1999-01-11 04:05:06')
+
+INSERT INTO manual_maintenance VALUES (1,'Bad contact wire',1,'1999-01-12 04:05:06', 'Engenheiro Carlos Miguel','The wire was replaced',1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- ERROR's 
+measurements tem que se tirar o running version

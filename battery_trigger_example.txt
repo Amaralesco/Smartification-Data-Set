@@ -1,0 +1,18 @@
+CREATE FUNCTION monitor_battery() RETURNS trigger AS $monitor_battery$
+    BEGIN
+        IF NEW.value < 15 THEN
+            
+
+            INSERT INTO 
+                automatic_monitoring(measurements_log_id,solved,description,time_stamp,risk) 
+                VALUES (new.measurements_log_id,false,'Battery value is running very low', CURRENT_TIMESTAMP,2);
+                   
+        END IF;
+
+
+        RETURN NEW;
+    END;
+$monitor_battery$ LANGUAGE plpgsql;
+
+CREATE TRIGGER monitor_battery AFTER INSERT OR UPDATE ON measurements
+    FOR EACH ROW EXECUTE FUNCTION monitor_battery();

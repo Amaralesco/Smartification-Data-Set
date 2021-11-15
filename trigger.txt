@@ -1,0 +1,57 @@
+---TODO: Change the name from monitor_battery to monitor in fucntion(twice) and in trigger (twice)
+
+CREATE or REPLACE FUNCTION monitor_battery() RETURNS trigger AS $monitor_battery$
+    BEGIN
+        IF NEW.sensor = 'Battery' THEN
+            IF NEW.value < 15 THEN
+                
+
+                INSERT INTO 
+                    automatic_monitoring(measurements_log_id,solved,description,time_stamp,risk) 
+                    VALUES (new.measurements_log_id,false,'Battery value is running very low', CURRENT_TIMESTAMP,2);
+                       
+            END IF;
+        
+
+        ELSEIF NEW.sensor = 'Hinge Value X' THEN
+            
+            IF NEW.value >10 THEN
+
+                INSERT INTO 
+                    automatic_monitoring(measurements_log_id,solved,description,time_stamp,risk) 
+                    VALUES (new.measurements_log_id,false,'Hinge X is critically loose, the mechanism might be compromised', CURRENT_TIMESTAMP,3);
+
+            
+            ELSEIF NEW.value >5 THEN
+
+                INSERT INTO 
+                    automatic_monitoring(measurements_log_id,solved,description,time_stamp,risk) 
+                    VALUES (new.measurements_log_id,false,'Hinge X is  loose, might affect QoS', CURRENT_TIMESTAMP,2);
+
+            END IF;
+
+        ELSEIF NEW.sensor = 'Hinge Value Y' THEN
+            
+            IF NEW.value >10 THEN
+
+                INSERT INTO 
+                    automatic_monitoring(measurements_log_id,solved,description,time_stamp,risk) 
+                    VALUES (new.measurements_log_id,false,'Hinge Y is critically loose, the mechanism might be compromised', CURRENT_TIMESTAMP,3);
+
+            
+            ELSEIF NEW.value >5 THEN
+
+                INSERT INTO 
+                    automatic_monitoring(measurements_log_id,solved,description,time_stamp,risk) 
+                    VALUES (new.measurements_log_id,false,'Hinge Y is  loose, might affect QoS', CURRENT_TIMESTAMP,2);
+
+            END IF;
+
+        END IF;
+
+        RETURN NEW;
+    END;
+$monitor_battery$ LANGUAGE plpgsql;
+
+CREATE TRIGGER monitor_battery AFTER INSERT OR UPDATE ON measurements
+    FOR EACH ROW EXECUTE FUNCTION monitor_battery();
